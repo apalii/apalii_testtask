@@ -1,0 +1,57 @@
+{% extends "main.html" %}
+{% block title %}Operations{% endblock %}
+
+{% block content %}
+Your last login : {{ user.last_login|date:"H:i:s d M Y" }}<br><br>
+{% if user.is_authenticated %}
+
+<form id="1" class="form-horizontal" action="/take_cash/" method="post">{% csrf_token %}
+      <div class="form-group">
+        <label class="col-sm-1 control-label">Take cash</label>
+        <div class="col-sm-3">
+          <input name="amount" id="amount" class="form-control"  placeholder="amount" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-4">    
+            <table>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="0" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="1" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="2" onclick="input(this);" /></td>
+                </tr>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="3" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="4" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="5" onclick="input(this);" /></td>
+                </tr>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="6" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="7" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="8" onclick="input(this);" /></td>
+                </tr>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="c" title="Clear" onclick="$('#1 #amount').val('')" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="9" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="submit" value=">" title="Submit"/></td>  
+                </tr>
+            </table>
+            <table>            
+                <tr>
+                    <td><a href="/logout/"><button type="button" class="btn btn-default btn-lg btn-block">EXIT</button></a></td>
+                </tr>
+            </table>    
+        </div>
+      </div>    
+</form>
+
+{% else %}
+    <a href="/login/?next={{ request.path }}">Login</a>
+{% endif %}
+<script>
+    function input(el) {
+        var container = document.getElementById("amount");
+        container.value += el.value;
+    }
+</script>
+{% endblock %}

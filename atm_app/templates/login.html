@@ -1,0 +1,193 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block title %}Auth{% endblock %}
+
+{% block additional_js %}
+<link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet"/>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<br>
+<form id="1" class="form-horizontal" action="/check/" method="get">
+      <div class="form-group">
+        <label class="col-sm-1 control-label">Card Number</label>
+        <div class="col-sm-3">
+          <input name="number" id="number" maxlength="16" class="form-control"  placeholder="Card number" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-4">    
+            <table>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="0" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="1" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="2" onclick="input(this);" /></td>
+                </tr>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="3" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="4" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="5" onclick="input(this);" /></td>
+                </tr>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="6" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="7" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="8" onclick="input(this);" /></td>
+                </tr>
+                <tr>
+                    <td><input class="btn btn-lg btn-default" type="button" value="c" title="Clear" onclick="$('#1 #number').val('')" /></td>
+                    <td><input class="btn btn-lg btn-default" type="button" value="9" onclick="input(this);" /></td>
+                    <td><input class="btn btn-lg btn-default" type="submit" value=">" title="Enter"/></td>  
+                </tr>
+            </table>
+            <table>            
+                <tr>
+                    <td><a href="/"><button type="button" class="btn btn-default btn-lg btn-block">EXIT</button></a></td>
+                </tr>
+            </table>    
+        </div>
+      </div>    
+</form>
+
+<form id="2" style=display:none class="form-horizontal" action="/auth/" method="post">{% csrf_token %}
+      <div class="form-group">
+        <label class="col-sm-1 control-label">PIN Code</label>
+        <div class="col-sm-3">
+          <input name="password" id="pin" maxlength="4" type="password" class="form-control"  placeholder="Pin code" />
+        </div>
+      </div>    
+
+      <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-4">    
+            <table>
+    <tr>
+        <td><input class="btn btn-lg btn-default" type="button" value="0" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="1" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="2" onclick="input_pin(this);" /></td>
+    </tr>
+    <tr>
+        <td><input class="btn btn-lg btn-default" type="button" value="3" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="4" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="5" onclick="input_pin(this);" /></td>
+    </tr>
+    <tr>
+        <td><input class="btn btn-lg btn-default" type="button" value="6" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="7" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="8" onclick="input_pin(this);" /></td>
+    </tr>
+    <tr>
+        <td><input class="btn btn-lg btn-default" type="button" value="c" title="Clear" onclick="$('#2 #pin').val('')" /></td>
+        <td><input class="btn btn-lg btn-default" type="button" value="9" onclick="input_pin(this);" /></td>
+        <td><input class="btn btn-lg btn-default" type="submit" method="post" value=">" title="Enter"/></td>  
+    </tr>
+</table>    
+        </div>
+      </div>
+</form>
+<br><br>
+<script>
+ 
+function input(el) {
+    var container = document.getElementById("number");
+    var len = container.value.length;
+    if (len <= 18) {
+        container.value += el.value;
+        origLen = container.value.replace(/-/g, '').length
+        if (origLen % 4 == 0 && Math.floor(origLen / 4) <= 3) {
+            container.value += '-'
+        }
+    }
+}
+    
+function input_pin(el) {
+    var container = document.getElementById("pin");
+    var len = container.value.length;
+    if (len < 4) {
+        container.value += el.value;
+    }
+}    
+    
+$(document).ready(function() {
+    $('#1').on('submit', function() { 
+        return $('#number').val().toString().length === 19; 
+    });
+});
+  
+(function() {
+
+    var API = (function() {
+
+        var URLS = {
+            check: '/check/',
+            auth: '/auth/'
+        };
+
+        var sendRequest = function(action, request, callback) {
+            $.ajax({
+                url: URLS[action],
+                method: action === 'check' ? 'GET' : 'POST',
+                type: 'json',
+                data: request,
+                success: callback
+            });
+        };
+
+        var check = function(request, callback) {
+            sendRequest('check', request, callback);
+        };
+
+        var auth = function(request, callback) {
+            sendRequest('auth', request, callback);
+        };
+
+        return {
+            check: check,
+            auth: auth
+        };
+    })();
+
+    var init = function() {
+        var checkForm = $('#1'),
+            authForm = $('#2');
+
+        var number = null;
+
+        var continueCheck = function(response) {
+            if (response && response.valid && response.is_active) {
+                // hide first form and  show the second
+                checkForm.hide();
+                authForm.show();
+                number = response.number_requested;
+            }
+        };
+
+        var continueAuth = function(response) {
+            console.log('auth:', response, response.success);
+            if (response && response.success) {
+                window.location.href = '/loggedin/';
+            }
+            else {
+                 window.location.href = '/invalid/';
+            }
+        };
+
+        checkForm.find('table').find('input').last().click(function() {
+            var request = checkForm.serialize();
+            API.check(request, continueCheck);
+            return false;
+        });
+
+        authForm.find('table').find('input').last().click(function() {
+            var request = authForm.serialize();
+            request += '&number=' + number;
+            API.auth(request, continueAuth);
+            return false;
+        });
+    };
+
+    $(document).ready(init);
+})();    
+    
+</script>
+{% endblock %}

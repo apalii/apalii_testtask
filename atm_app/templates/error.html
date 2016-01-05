@@ -1,0 +1,11 @@
+{% extends "main.html" %}
+{% block title %}Error{% endblock %}
+
+{% block content %}
+
+<div class="alert alert-danger">
+    <a href="{{ path }}" class="close" data-dismiss="alert">&times;</a>
+    <strong>{{ message }}</strong>
+</div>
+
+{% endblock %}

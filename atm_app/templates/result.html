@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block title %}Success{% endblock %}
+
+{% block content %}
+<h3>Success !</h3><br>
+{% if user.is_authenticated %}
+
+<div class="form-group">
+<div class="col-sm-3">
+    <br>
+    Amount requested : {{ op.diff }}<br>
+    Current balance : {{ op.cur_balance }}<br>
+    Previos balance : {{ op.prev_balance }}<br>
+    Operation code : {{ op.operation_code }}<br><br>
+    Thank you for choosing our bank !<br><br><br>
+    <a href="/logout/"><button type="button" class="btn btn-default btn-lg btn-block">Logout</button><br>
+</div> </div>  
+{% else %}
+    <a href="/login/?next={{ request.path }}">Login</a>
+{% endif %}
+
+{% endblock %}
