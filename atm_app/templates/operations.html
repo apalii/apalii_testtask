@@ -2,17 +2,25 @@
 {% block title %}Operations{% endblock %}
 
 {% block content %}
-<h3>Welcome to operations page</h3><br>
-Your last login : {{ user.last_login|date:"H:i:s d M Y" }}
-{% if user.is_authenticated %}
 
-<div class="form-group">
-<div class="col-sm-3">
-    <br>Your card number : {{ user.number }}<br>
-    <a href="/balance/"><button type="button" class="btn btn-default btn-lg btn-block">Balance</button><br>
-    <a href="/take_cash/"><button type="button" class="btn btn-default btn-lg btn-block">Take cash</button><br>
-    <a href="/logout/"><button type="button" class="btn btn-default btn-lg btn-block">Logout</button><br>
-</div> </div>  
+{% if user.is_authenticated %}
+    <div class="operations">
+        <div class="row">
+            <div class="col-xs-offset-3 col-xs-6">
+                <a href="/balance/" class="btn btn-default btn-lg btn-block">Balance</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-offset-3 col-xs-6">
+                <a href="/cash_withdrawal/" class="btn btn-default btn-lg btn-block">Cash Withdrawal</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-offset-3 col-xs-6">
+                <a href="/logout/" class="btn btn-default btn-lg btn-block">Finish</a>
+            </div>
+        </div>
+    </div>
 {% else %}
     <a href="/login/?next={{ request.path }}">Login</a>
 {% endif %}

@@ -7,7 +7,7 @@ from django.contrib.auth.models import (
 class CardUserManager(BaseUserManager):
     def create_user(self, number, password=None):
         if not number:
-            raise ValueError('Card must have a number')
+            raise ValueError('Card must be a number')
         user = self.model(number=number)
         user.is_admin = False
         user.set_password(password)
@@ -61,14 +61,16 @@ class Card(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
     
     def __unicode__(self):
-        return "{} | balance: {} | active: {}".format(self.number, self.balance, self.is_active)   
-    
-    
+        return "{} | balance: {} | active: {}".format(
+            self.number, self.balance, self.is_active)
+
+
 class Operations(models.Model):
     prev_balance = models.IntegerField()
     cur_balance = models.IntegerField()
     diff = models.IntegerField()
     operation_code = models.IntegerField(default=10000000000)
+    operation_type = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now_add=True)
     operation_card = models.ForeignKey(Card)
     
@@ -77,5 +79,6 @@ class Operations(models.Model):
         ordering = ['timestamp']
         
     def __unicode__(self):
-        return "{} : {}/{}".format(
-            self.operation_code, self.timestamp, self.diff) 
+        return "{}/{}/{}/{}".format(
+            self.operation_code, self.operation_type, self.timestamp, self.diff)
+

@@ -1,0 +1,59 @@
+.container {
+    min-width: 992px;
+}
+
+.session-info {
+    margin-bottom: 2em;
+}
+
+.operations > .row {
+    margin-bottom: .5em;
+}
+
+body {
+    font-family: 'PT Sans', sans-serif;
+}
+
+.numbox {
+    background-color: white !important;
+    border-radius: 0;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 20px;
+    height: 60px;
+    padding: 15px;
+    width: 300px;
+}
+
+.numbox:focus,
+.numbox:active {
+    border-color: initial;
+    box-shadow: none;
+}
+
+.numpad {
+    margin: -7px -3px;
+}
+
+.numpad-row {
+    white-space: nowrap;
+    margin: 7px 0;
+}
+
+.numpad-row > .btn {
+    width: 60px;
+    height: 60px;
+    margin: 0 3px;
+}
+
+.m-bt-sm {
+    margin-bottom: 7px;
+}
+
+.m-bt-md {
+    margin-bottom: 15px;
+}
+
+.m-bt-lg {
+    margin-bottom: 30px;
+}

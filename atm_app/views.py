@@ -5,11 +5,12 @@ from django.utils import timezone
 from apalii_testtask import settings
 from atm_app.models import Card, Operations
 from django.core.context_processors import csrf
-from django.shortcuts import render, render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.contrib import auth
+from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-
+requests.packages.urllib3.disable_warnings()
 
 def kurs_privat():
     '''Безналичный курс Приватбанка
@@ -47,40 +48,87 @@ def card_login(request):
     args.update(csrf(request))
     return render_to_response('login.html', args)
 
+
+def card_logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect("/")
+
+
 def card_auth(request):
+    print request
     number = request.POST['number']
     password = request.POST['password']
     print number, password
     user = auth.authenticate(number=number, password=password)
-    print (number, password, user.is_authenticated())
+    card = Card.objects.get(number=number)
     if user is not None:
         auth.login(request, user)
-        # return HttpResponseRedirect('/loggedin/')
+        card.attempts = 0
+        card.save(update_fields=['attempts'])
         response = json.dumps({"success": True})
         return HttpResponse(response, content_type='application/json')
-    else:
-        #return HttpResponseRedirect('/invalid/')
-        response = json.dumps({"success": False})
+    elif card.attempts < 3:
+        tries = card.attempts + 1
+        card.attempts = F('attempts') + 1
+        card.save()
+        response = json.dumps(
+            {'message': "Wrong PIN. Attempts left : {}".format(3 - tries),
+            'tries': tries
+           }
+        )
         print response
-        return HttpResponse(response, content_type='application/json')
+        return HttpResponse(response, content_type='application/json', status=401)
+    elif card.attempts >= 3:
+        card.is_active = False
+        card.save()
+        response = json.dumps(
+            {'message': "Your card is blocked !",
+            'tries': 0
+           }
+        )
+        print card.attempts, response
+        return HttpResponse(response, content_type='application/json', status=401)
 
     
+def blocked(request):
+    args = {'message': 'Your card is blocked ! '
+            'Please contact our support department 8-800-111-222-333',
+            'path': "/"
+           }
+    return render_to_response('error.html', args)
+
+
+def card_invalid(request):
+    path = request.META.get('PATH_INFO')
+    args = {'message': 'Invalid password ! Try again !',
+            'path': path
+           }
+    return render_to_response('error.html', args)
+
+
 @login_required
-def card_loggedin(request):
-    card = Card.objects.filter(id=request.user.id)[0]
-    args = {}
-    print request.user.is_authenticated(), request.user.id, card.balance
-    return render(request, 'operations.html', args)
+def operations(request):
+    return render(request, 'operations.html')
+
 
 @login_required
 def balance(request):
     args = {}
     args['today'] = timezone.now()
-    print request.user.is_authenticated(), request.user.id    
+    card = Card.objects.get(id=request.user.id)
+    new_op_id = str(card.id) + time.time().__str__().replace('.', "")
+    new_op = Operations.objects.create(prev_balance=card.balance,
+                                       cur_balance=card.balance,
+                                       diff=0,
+                                       operation_type = "balance",
+                                       operation_code=new_op_id,
+                                       operation_card=card
+                                      )
     return render(request, 'balance.html', args)
 
+
 @login_required
-def take_cash(request):
+def cash_withdrawal(request):
     if request.method == 'GET':
         args = {}
         args.update(csrf(request))
@@ -91,9 +139,8 @@ def take_cash(request):
         card = Card.objects.filter(id=request.user.id)
         #op = Operations.objects.filter(id=request.user.id)[0]
         if amount > card[0].balance:
-            path = request.META.get('PATH_INFO')
             args = {'message': 'Not enough money !',
-                    'path': path
+                    'path': '/operations/'
                     }
             return render_to_response('error.html', args)
         prev_balance = card[0].balance
@@ -103,30 +150,18 @@ def take_cash(request):
         new_op = Operations.objects.create(prev_balance=prev_balance,
                                            cur_balance=cur_balance,
                                            diff=amount,
+                                           operation_type = "withdrawal",
                                            operation_code=new_op_id,
                                            operation_card=card[0]
                                           )
-        return render(request, 'result.html', {'op': new_op})
-
-        
-def card_invalid(request):
-    return render_to_response('invalid.html')
+        request.session['op'] = new_op.id
+        print request.session['op']
+        return redirect('/result/')
 
 
-def card_logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect("/")
-
-"""
 @login_required
-def operations(request):
-    #card = Card.objects.filter(id=request.user.id)[0]
-    args = {}
-    #args.update(csrf(request))
-    #args['balance'] = card.balance
-    #args['balance'] = card.number
-    print request.user.number, request.user.id, card.balance
-    return render_to_response('operations.html', args)
-    """
-
+def result(request):
+    new_op = request.session.get('op')
+    qwe = Operations.objects.get(id=new_op)
+    return render(request, 'result.html', {'op': qwe})
 

@@ -1,93 +1,65 @@
 {% extends "main.html" %}
 {% load static %}
-
 {% block title %}Auth{% endblock %}
-
-{% block additional_js %}
-<link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet"/>
-<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-{% endblock %}
-
 {% block content %}
-<br>
 <form id="1" class="form-horizontal" action="/check/" method="get">
-      <div class="form-group">
-        <label class="col-sm-1 control-label">Card Number</label>
-        <div class="col-sm-3">
-          <input name="number" id="number" maxlength="16" class="form-control"  placeholder="Card number" />
+<div class="m-bt-lg text-center">
+    <input name="number" id="number" class="numbox m-bt-md" placeholder="Card number" readonly />
+    <div class="numpad">
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="1" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="button" value="2" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="button" value="3" onclick="input(this);">
         </div>
-      </div>
-      <div class="form-group">
-        <div class="col-sm-offset-1 col-sm-4">    
-            <table>
-                <tr>
-                    <td><input class="btn btn-lg btn-default" type="button" value="0" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="1" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="2" onclick="input(this);" /></td>
-                </tr>
-                <tr>
-                    <td><input class="btn btn-lg btn-default" type="button" value="3" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="4" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="5" onclick="input(this);" /></td>
-                </tr>
-                <tr>
-                    <td><input class="btn btn-lg btn-default" type="button" value="6" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="7" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="8" onclick="input(this);" /></td>
-                </tr>
-                <tr>
-                    <td><input class="btn btn-lg btn-default" type="button" value="c" title="Clear" onclick="$('#1 #number').val('')" /></td>
-                    <td><input class="btn btn-lg btn-default" type="button" value="9" onclick="input(this);" /></td>
-                    <td><input class="btn btn-lg btn-default" type="submit" value=">" title="Enter"/></td>  
-                </tr>
-            </table>
-            <table>            
-                <tr>
-                    <td><a href="/"><button type="button" class="btn btn-default btn-lg btn-block">EXIT</button></a></td>
-                </tr>
-            </table>    
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="4" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="button" value="5" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="button" value="6" onclick="input(this);">
         </div>
-      </div>    
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="7" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="button" value="8" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="button" value="9" onclick="input(this);">
+        </div>
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="C" title="Cancel" onclick="$('#1 #number').val('')">
+            <input class="btn btn-lg btn-default" type="button" value="0" onclick="input(this);">
+            <input class="btn btn-lg btn-default" type="submit" value=">" title="Submit">
+        </div>
+    </div>
+</div>
 </form>
 
 <form id="2" style=display:none class="form-horizontal" action="/auth/" method="post">{% csrf_token %}
-      <div class="form-group">
-        <label class="col-sm-1 control-label">PIN Code</label>
-        <div class="col-sm-3">
-          <input name="password" id="pin" maxlength="4" type="password" class="form-control"  placeholder="Pin code" />
+<div class="m-bt-lg text-center">
+    <input name="password" id="pin" type="password" class="numbox m-bt-md"  placeholder="Pin code" readonly />
+    <div class="numpad">
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="1" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="button" value="2" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="button" value="3" onclick="input_pin(this);">
         </div>
-      </div>    
-
-      <div class="form-group">
-        <div class="col-sm-offset-1 col-sm-4">    
-            <table>
-    <tr>
-        <td><input class="btn btn-lg btn-default" type="button" value="0" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="1" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="2" onclick="input_pin(this);" /></td>
-    </tr>
-    <tr>
-        <td><input class="btn btn-lg btn-default" type="button" value="3" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="4" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="5" onclick="input_pin(this);" /></td>
-    </tr>
-    <tr>
-        <td><input class="btn btn-lg btn-default" type="button" value="6" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="7" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="8" onclick="input_pin(this);" /></td>
-    </tr>
-    <tr>
-        <td><input class="btn btn-lg btn-default" type="button" value="c" title="Clear" onclick="$('#2 #pin').val('')" /></td>
-        <td><input class="btn btn-lg btn-default" type="button" value="9" onclick="input_pin(this);" /></td>
-        <td><input class="btn btn-lg btn-default" type="submit" method="post" value=">" title="Enter"/></td>  
-    </tr>
-</table>    
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="4" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="button" value="5" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="button" value="6" onclick="input_pin(this);">
         </div>
-      </div>
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="7" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="button" value="8" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="button" value="9" onclick="input_pin(this);">
+        </div>
+        <div class="numpad-row">
+            <input class="btn btn-lg btn-default" type="button" value="C" title="Cancel" onclick="$('#2 #pin').val('')">
+            <input class="btn btn-lg btn-default" type="button" value="0" onclick="input_pin(this);">
+            <input class="btn btn-lg btn-default" type="submit" value=">" title="Submit">
+        </div>
+    </div>
+</div>
 </form>
 <br><br>
 <script>
- 
+
 function input(el) {
     var container = document.getElementById("number");
     var len = container.value.length;
@@ -99,21 +71,21 @@ function input(el) {
         }
     }
 }
-    
+
 function input_pin(el) {
     var container = document.getElementById("pin");
     var len = container.value.length;
     if (len < 4) {
         container.value += el.value;
     }
-}    
-    
+}
+
 $(document).ready(function() {
-    $('#1').on('submit', function() { 
-        return $('#number').val().toString().length === 19; 
+    $('#1').on('submit', function() {
+        return $('#number').val().toString().length === 19;
     });
 });
-  
+
 (function() {
 
     var API = (function() {
@@ -124,7 +96,7 @@ $(document).ready(function() {
         };
 
         var sendRequest = function(action, request, callback) {
-            $.ajax({
+            return $.ajax({
                 url: URLS[action],
                 method: action === 'check' ? 'GET' : 'POST',
                 type: 'json',
@@ -136,9 +108,19 @@ $(document).ready(function() {
         var check = function(request, callback) {
             sendRequest('check', request, callback);
         };
-
+        
         var auth = function(request, callback) {
-            sendRequest('auth', request, callback);
+            sendRequest('auth', request, callback).
+                fail(function (er){
+                    var response = JSON.parse(er.responseText);
+                    if (response.tries > 0) {
+                        alert(response.message);
+                        console.log("Tries :", response.tries);   
+                    }
+                    else {
+                        window.location.href = '/blocked/';
+                    }
+                });
         };
 
         return {
@@ -160,25 +142,25 @@ $(document).ready(function() {
                 authForm.show();
                 number = response.number_requested;
             }
+            else {
+                alert("Card is invalid. Please contact support department.");
+            }
         };
 
         var continueAuth = function(response) {
             console.log('auth:', response, response.success);
             if (response && response.success) {
-                window.location.href = '/loggedin/';
-            }
-            else {
-                 window.location.href = '/invalid/';
+                window.location.href = '/operations/';
             }
         };
 
-        checkForm.find('table').find('input').last().click(function() {
+        checkForm.find('.btn').last().click(function() {
             var request = checkForm.serialize();
             API.check(request, continueCheck);
             return false;
         });
 
-        authForm.find('table').find('input').last().click(function() {
+        authForm.find('.btn').last().click(function() {
             var request = authForm.serialize();
             request += '&number=' + number;
             API.auth(request, continueAuth);
@@ -187,7 +169,7 @@ $(document).ready(function() {
     };
 
     $(document).ready(init);
-})();    
-    
+})();
+
 </script>
 {% endblock %}
