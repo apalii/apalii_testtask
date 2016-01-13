@@ -5,11 +5,14 @@ from django.utils import timezone
 from apalii_testtask import settings
 from atm_app.models import Card, Operations
 from django.core.context_processors import csrf
-from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.contrib import auth
 from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import (
+    render, render_to_response, get_object_or_404, redirect
+)
+
 requests.packages.urllib3.disable_warnings()
 
 def kurs_privat():
@@ -77,7 +80,8 @@ def card_auth(request):
            }
         )
         print response
-        return HttpResponse(response, content_type='application/json', status=401)
+        return HttpResponse(response,
+                            content_type='application/json', status=401)
     elif card.attempts >= 3:
         card.is_active = False
         card.save()
@@ -87,9 +91,10 @@ def card_auth(request):
            }
         )
         print card.attempts, response
-        return HttpResponse(response, content_type='application/json', status=401)
+        return HttpResponse(response,
+                            content_type='application/json', status=401)
 
-    
+
 def blocked(request):
     args = {'message': 'Your card is blocked ! '
             'Please contact our support department 8-800-111-222-333',
@@ -108,14 +113,16 @@ def card_invalid(request):
 
 @login_required
 def operations(request):
+    card = Card.objects.get(id=request.user.id)
+    print card.last_login, "operations"
     return render(request, 'operations.html')
 
 
 @login_required
 def balance(request):
+    card = Card.objects.get(id=request.user.id)
     args = {}
     args['today'] = timezone.now()
-    card = Card.objects.get(id=request.user.id)
     new_op_id = str(card.id) + time.time().__str__().replace('.', "")
     new_op = Operations.objects.create(prev_balance=card.balance,
                                        cur_balance=card.balance,

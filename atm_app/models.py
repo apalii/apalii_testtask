@@ -29,12 +29,13 @@ class Card(AbstractBaseUser, PermissionsMixin):
     balance = models.IntegerField(default=0)
 
     objects = CardUserManager()
-    
+
     USERNAME_FIELD = 'number'
-    REQUIRED_FIELDS = []  
-    
+    REQUIRED_FIELDS = []
+
     class Meta():
-        db_table = 'cards'  
+        db_table = 'cards'
+        verbose_name = 'Card'
 
     def get_full_name(self):
         # The user is identified by their email address
@@ -59,7 +60,7 @@ class Card(AbstractBaseUser, PermissionsMixin):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
-    
+
     def __unicode__(self):
         return "{} | balance: {} | active: {}".format(
             self.number, self.balance, self.is_active)
@@ -73,12 +74,14 @@ class Operations(models.Model):
     operation_type = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now_add=True)
     operation_card = models.ForeignKey(Card)
-    
+
     class Meta():
         db_table = 'operations'
+        verbose_name = 'Operation'
+        verbose_name_plural = 'Operations'
         ordering = ['timestamp']
-        
+
     def __unicode__(self):
-        return "{}/{}/{}/{}".format(
-            self.operation_code, self.operation_type, self.timestamp, self.diff)
+        return "{} | {} | {} | {}".format(
+            self.operation_type, self.operation_code,  self.timestamp, self.diff)
 

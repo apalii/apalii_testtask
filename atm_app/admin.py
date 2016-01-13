@@ -1,10 +1,19 @@
 from django.contrib import admin
 from atm_app.models import Card, Operations
 
-class TaskInline(admin.StackedInline):
-    model = Operations
 
-class TaskAdmin(admin.ModelAdmin):
-    inlines = [TaskInline]
+class OpAdmin(admin.ModelAdmin):
+    list_display = ('operation_type',
+                   'timestamp',
+                   'cur_balance')
+    date_hierarchy = 'timestamp'
 
-admin.site.register((Card, Operations))
+class CardAdmin(admin.ModelAdmin):
+    list_display = ('number',
+                    'is_active',
+                   'balance')
+    #date_hierarchy = 'timestamp'
+
+
+admin.site.register(Card, CardAdmin)
+admin.site.register(Operations, OpAdmin)
