@@ -27,6 +27,7 @@ class Card(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     attempts = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)
+    was_last_time = models.DateTimeField(null=True, blank=True)
 
     objects = CardUserManager()
 
@@ -36,6 +37,7 @@ class Card(AbstractBaseUser, PermissionsMixin):
     class Meta():
         db_table = 'cards'
         verbose_name = 'Card'
+        verbose_name_plural = 'Cards'
 
     def get_full_name(self):
         # The user is identified by their email address

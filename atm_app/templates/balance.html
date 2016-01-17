@@ -7,14 +7,14 @@
         <div class="clearfix">
             <div class="pull-left">
 {% if user.is_authenticated %}
-                <span>Your last login :</span></br>
+                <span>Your balance :</span></br>
                 <span>Your card number :</span></br>
-                <span>Your balance :</span>
+                <span>Your last login :</span>
             </div>
             <div class="col-xs-8">
-                <span>{{ user.last_login|date:"H:i:s d M Y" }}</span></br>
+                <span><b>{{ user.balance }}</b></span></br>
                 <span>{{ user.number }}</span></br>
-                <span>{{ user.balance }}</span>
+                <span>{{ last_login|date:"H:i:s d M Y" }}</span>
             </div>
         </div>
     </div>

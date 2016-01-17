@@ -9,6 +9,9 @@ from django.contrib import auth
 from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import (
+    require_http_methods, require_safe, require_POST
+)
 from django.shortcuts import (
     render, render_to_response, get_object_or_404, redirect
 )
@@ -23,27 +26,26 @@ def kurs_privat():
     kurs = requests.get(url).json()[0]
     return 'buy {} | sale {}'.format(kurs['buy'], kurs['sale'])
 
+
 def main_page(request):
     now = timezone.now()
     return render_to_response('main.html',
                               {'kurs': kurs_privat(),})
 
 
+@require_safe
 def check(request):
-    if request.method == 'GET':
-        number = request.GET['number'].replace("-", "")
-        to_response = {}
-        to_response['number_requested'] = number
-        try:
-            card = Card.objects.filter(number=number)[0]
-            to_response['is_active'] = True if card.is_active else False
-        except IndexError:
-            card = None
-        to_response['valid'] = True if card else False
-        response = json.dumps(to_response)
-        return HttpResponse(response, content_type='application/json')
-    else:
-        raise Http404("GET only")
+    number = request.GET['number'].replace("-", "")
+    to_response = {}
+    to_response['number_requested'] = number
+    try:
+        card = Card.objects.filter(number=number)[0]
+        to_response['is_active'] = True if card.is_active else False
+    except IndexError:
+        card = None
+    to_response['valid'] = True if card else False
+    response = json.dumps(to_response)
+    return HttpResponse(response, content_type='application/json')
 
 
 def card_login(request):
@@ -53,19 +55,23 @@ def card_login(request):
 
 
 def card_logout(request):
+    card_id = request.session.get('card_id')
+    card = Card.objects.get(id=card_id)
+    card.was_last_time = card.last_login
+    card.save(update_fields=['was_last_time'])
     auth.logout(request)
     return HttpResponseRedirect("/")
 
 
+@require_POST
 def card_auth(request):
-    print request
     number = request.POST['number']
     password = request.POST['password']
-    print number, password
     user = auth.authenticate(number=number, password=password)
     card = Card.objects.get(number=number)
     if user is not None:
         auth.login(request, user)
+        request.session['card_id'] = card.id
         card.attempts = 0
         card.save(update_fields=['attempts'])
         response = json.dumps({"success": True})
@@ -79,7 +85,6 @@ def card_auth(request):
             'tries': tries
            }
         )
-        print response
         return HttpResponse(response,
                             content_type='application/json', status=401)
     elif card.attempts >= 3:
@@ -90,7 +95,6 @@ def card_auth(request):
             'tries': 0
            }
         )
-        print card.attempts, response
         return HttpResponse(response,
                             content_type='application/json', status=401)
 
@@ -113,8 +117,6 @@ def card_invalid(request):
 
 @login_required
 def operations(request):
-    card = Card.objects.get(id=request.user.id)
-    print card.last_login, "operations"
     return render(request, 'operations.html')
 
 
@@ -123,6 +125,7 @@ def balance(request):
     card = Card.objects.get(id=request.user.id)
     args = {}
     args['today'] = timezone.now()
+    args['last_login'] = card.was_last_time
     new_op_id = str(card.id) + time.time().__str__().replace('.', "")
     new_op = Operations.objects.create(prev_balance=card.balance,
                                        cur_balance=card.balance,
@@ -134,6 +137,7 @@ def balance(request):
     return render(request, 'balance.html', args)
 
 
+@require_http_methods(["GET", "POST"])
 @login_required
 def cash_withdrawal(request):
     if request.method == 'GET':
@@ -162,7 +166,6 @@ def cash_withdrawal(request):
                                            operation_card=card[0]
                                           )
         request.session['op'] = new_op.id
-        print request.session['op']
         return redirect('/result/')
 
 
