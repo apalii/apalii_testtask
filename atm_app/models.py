@@ -1,5 +1,6 @@
-from django.utils import timezone
 from django.db import models
+from django.utils import timezone
+from django.core.validators import MinValueValidator
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
@@ -22,7 +23,9 @@ class CardUserManager(BaseUserManager):
 
 
 class Card(AbstractBaseUser, PermissionsMixin):
-    number = models.IntegerField(unique=True)
+    number = models.IntegerField(
+        unique=True, validators=[MinValueValidator(0)]
+    )
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     attempts = models.IntegerField(default=0)
@@ -71,7 +74,7 @@ class Card(AbstractBaseUser, PermissionsMixin):
 class Operations(models.Model):
     prev_balance = models.IntegerField()
     cur_balance = models.IntegerField()
-    diff = models.IntegerField()
+    diff = models.PositiveIntegerField()
     operation_code = models.IntegerField(default=10000000000)
     operation_type = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -84,6 +87,6 @@ class Operations(models.Model):
         ordering = ['timestamp']
 
     def __unicode__(self):
-        return "{} | {} | {} | {}".format(
-            self.operation_type, self.operation_code,  self.timestamp, self.diff)
+        return "{} | {} | {}".format(
+            self.operation_type, self.timestamp, self.diff)
 

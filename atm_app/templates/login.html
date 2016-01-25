@@ -108,14 +108,14 @@ $(document).ready(function() {
         var check = function(request, callback) {
             sendRequest('check', request, callback);
         };
-        
+
         var auth = function(request, callback) {
             sendRequest('auth', request, callback).
                 fail(function (er){
                     var response = JSON.parse(er.responseText);
                     if (response.tries > 0) {
                         alert(response.message);
-                        console.log("Tries :", response.tries);   
+                        console.log("Tries :", response.tries);
                     }
                     else {
                         window.location.href = '/blocked/';

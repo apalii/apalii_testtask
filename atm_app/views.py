@@ -9,6 +9,9 @@ from django.contrib import auth
 from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from atm_app.forms import (
+    LoginForm,
+)
 from django.views.decorators.http import (
     require_http_methods, require_safe, require_POST
 )
@@ -17,6 +20,33 @@ from django.shortcuts import (
 )
 
 requests.packages.urllib3.disable_warnings()
+
+class JSONResponse(HttpResponse):
+
+    def __init__(self, msg):
+        super(JSONResponse, self).__init__(
+            content=json.dumps(msg),
+            content_type='application/json'
+        )
+
+def test_form(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = NameForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = NameForm()
+
+    return render(request, 'name.html', {'form': form})
+
 
 def kurs_privat():
     '''Безналичный курс Приватбанка
@@ -44,8 +74,7 @@ def check(request):
     except IndexError:
         card = None
     to_response['valid'] = True if card else False
-    response = json.dumps(to_response)
-    return HttpResponse(response, content_type='application/json')
+    return JSONResponse(to_response)
 
 
 def card_login(request):
@@ -147,23 +176,23 @@ def cash_withdrawal(request):
         return render(request, 'take_cash.html', args)
     if request.method == 'POST':
         amount = int(request.POST['amount'])
-        card = Card.objects.filter(id=request.user.id)
-        #op = Operations.objects.filter(id=request.user.id)[0]
-        if amount > card[0].balance:
+        card = Card.objects.get(id=request.user.id)
+        if amount > card.balance:
             args = {'message': 'Not enough money !',
                     'path': '/operations/'
                     }
             return render_to_response('error.html', args)
-        prev_balance = card[0].balance
-        cur_balance = card[0].balance - amount
-        card.update(balance=cur_balance)
-        new_op_id = str(card[0].id) + time.time().__str__().replace('.', "")
+        prev_balance = card.balance
+        cur_balance = card.balance - amount
+        card.balance = cur_balance
+        card.save(update_fields=['balance'])
+        new_op_id = str(card.id) + time.time().__str__().replace('.', "")
         new_op = Operations.objects.create(prev_balance=prev_balance,
                                            cur_balance=cur_balance,
                                            diff=amount,
                                            operation_type = "withdrawal",
                                            operation_code=new_op_id,
-                                           operation_card=card[0]
+                                           operation_card=card
                                           )
         request.session['op'] = new_op.id
         return redirect('/result/')
