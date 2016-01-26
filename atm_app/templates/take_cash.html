@@ -3,7 +3,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<form id="1" class="form-horizontal" action="/cash_withdrawal/" method="post">{% csrf_token %}
+<form id="1" class="form-horizontal" action="{% url 'withdrawal' %}" method="post">{% csrf_token %}
 <div class="m-bt-lg text-center">
     <input name="amount" id="amount" class="numbox m-bt-md" placeholder="Amount" readonly />
     <div class="numpad">

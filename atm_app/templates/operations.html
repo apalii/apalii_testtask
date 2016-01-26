@@ -7,17 +7,17 @@
     <div class="operations">
         <div class="row">
             <div class="col-xs-offset-3 col-xs-6">
-                <a href="/balance/" class="btn btn-default btn-lg btn-block">Balance</a>
+                <a href="{% url 'balance' %}" class="btn btn-default btn-lg btn-block">Balance</a>
             </div>
         </div>
         <div class="row">
             <div class="col-xs-offset-3 col-xs-6">
-                <a href="/cash_withdrawal/" class="btn btn-default btn-lg btn-block">Cash Withdrawal</a>
+                <a href="{% url 'withdrawal' %}" class="btn btn-default btn-lg btn-block">Cash Withdrawal</a>
             </div>
         </div>
         <div class="row">
             <div class="col-xs-offset-3 col-xs-6">
-                <a href="/logout/" class="btn btn-default btn-lg btn-block">Finish</a>
+                <a href="{% url 'logout' %}" class="btn btn-default btn-lg btn-block">Finish</a>
             </div>
         </div>
     </div>

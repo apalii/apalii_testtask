@@ -1,15 +1,15 @@
 {% extends "main.html" %}
 {% load static %}
-{% block title %}Auth{% endblock %}
+{% block title %}test{% endblock %}
+{% block content %}
 
 {% block additional_js %}
 <script src={% static "js/login.js" %}></script>
 {% endblock %}
 
-{% block content %}
 <form id="1" class="form-horizontal" action="{% url 'check' %}" method="get">
 <div class="m-bt-lg text-center">
-    <input name="number" id="number" class="numbox m-bt-md" placeholder="Card number" readonly />
+    <input name="{{ form.number.html_name }}" id="number" class="numbox m-bt-md" placeholder="Card number" readonly />
     <div class="numpad">
         <div class="numpad-row">
             <input class="btn btn-lg btn-default" type="button" value="1" onclick="input(this);">
@@ -27,7 +27,7 @@
             <input class="btn btn-lg btn-default" type="button" value="9" onclick="input(this);">
         </div>
         <div class="numpad-row">
-            <input class="btn btn-lg btn-default" type="button" value="C" title="Cancel" onclick="$('#number').val('')">
+            <input class="btn btn-lg btn-default" type="button" value="C" title="Cancel" onclick="$('#1 #number').val('')">
             <input class="btn btn-lg btn-default" type="button" value="0" onclick="input(this);">
             <input class="btn btn-lg btn-default" type="submit" value=">" title="Submit">
         </div>
@@ -35,9 +35,9 @@
 </div>
 </form>
 
-<form id="2" style=display:none class="form-horizontal" action="{% url 'auth' %}" method="post">{% csrf_token %}
+<form id="2" style="display:none" class="form-horizontal" action="{% url 'auth' %}" method="post">{% csrf_token %}
 <div class="m-bt-lg text-center">
-    <input name="password" id="pin" type="password" class="numbox m-bt-md"  placeholder="Pin code" readonly />
+    <input name="{{ form.password.html_name }}" id="pin" type="password" class="numbox m-bt-md"  placeholder="Pin code" readonly />
     <div class="numpad">
         <div class="numpad-row">
             <input class="btn btn-lg btn-default" type="button" value="1" onclick="input_pin(this);">
@@ -62,5 +62,4 @@
     </div>
 </div>
 </form>
-<br><br>
 {% endblock %}
