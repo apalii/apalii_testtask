@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+import ujson as json
 import time
 import requests
 from django.db.models import F
@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.core.context_processors import csrf
 from .models import Card, Operations
 from .forms import LoginForm
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from django.views.decorators.http import (
@@ -19,14 +19,6 @@ from django.shortcuts import (
 )
 
 requests.packages.urllib3.disable_warnings()
-
-
-class JSONResponse(HttpResponse):
-    def __init__(self, msg):
-        super(JSONResponse, self).__init__(
-            content=json.dumps(msg),
-            content_type='application/json'
-        )
 
 
 def kurs_privat():
@@ -49,12 +41,12 @@ def check(request):
     number = request.GET['number'].replace("-", "")
     to_response = {'number_requested': number}
     try:
-        card = Card.objects.filter(number=number)[0]
+        card = Card.objects.get(number=number)
         to_response['is_active'] = True if card.is_active else False
-    except IndexError:
+    except Card.DoesNotExist:
         card = None
     to_response['valid'] = True if card else False
-    return JSONResponse(to_response)
+    return JsonResponse(to_response)
 
 
 def card_login(request):
@@ -83,34 +75,29 @@ def card_auth(request):
         request.session['card_id'] = card.id
         card.attempts = 0
         card.save(update_fields=['attempts'])
-        response = json.dumps({"success": True})
-        return HttpResponse(response, content_type='application/json')
+        return JsonResponse({"success": True})
     elif card.attempts < 3:
         tries = card.attempts + 1
         card.attempts = F('attempts') + 1
         card.save()
-        response = json.dumps(
-            {'message': "Wrong PIN. Attempts left : {}".format(3 - tries),
-             'tries': tries
+        response = {
+            'message': "Wrong PIN. Attempts left : {}".format(3 - tries),
+            'tries': tries
              }
-        )
-        return HttpResponse(response,
-                            content_type='application/json', status=401)
+        return JsonResponse(response, status=401)
     elif card.attempts >= 3:
         card.is_active = False
         card.save()
-        response = json.dumps(
-            {'message': "Your card is blocked !",
-             'tries': 0
-             }
-        )
-        return HttpResponse(response,
-                            content_type='application/json', status=401)
+        response = {
+            'message': "Your card is blocked !",
+            'tries': 0
+        }
+        return JsonResponse(response, status=401)
 
 
 def blocked(request):
     args = {'message': 'Your card is blocked ! '
-                       'Please contact our support department 8-800-111-222-333',
+                       'Please contact support department 8-800-111-22-33',
             'path': "/"
             }
     return render_to_response('error.html', args)
